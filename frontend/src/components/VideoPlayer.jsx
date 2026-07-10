@@ -26,6 +26,7 @@ export default function VideoPlayer({ media, onEnded, autoStart, autoplay }) {
   const [loop, setLoop] = useState(false); // repeat off by default (autoplay handles "next")
   const [loopLine, setLoopLine] = useState(false);
   const [ended, setEnded] = useState(false);
+  const [audioErr, setAudioErr] = useState(false);
   const [effEndMs, setEffEndMs] = useState(media.audioEndMs || media.durationMs || 0);
   const [ready, setReady] = useState(false);
   const [full, setFull] = useState(false);
@@ -42,7 +43,7 @@ export default function VideoPlayer({ media, onEnded, autoStart, autoplay }) {
 
   // reset when media changes; load any saved resume position
   useEffect(() => {
-    setPlaying(false); setStarted(false); setReady(false); setLoopLine(false); setEnded(false);
+    setPlaying(false); setStarted(false); setReady(false); setLoopLine(false); setEnded(false); setAudioErr(false);
     setCurrentMs(media.audioStartMs || 0);
     setEffEndMs(media.audioEndMs || media.durationMs || 0);
     setLoop(false);
@@ -222,7 +223,15 @@ export default function VideoPlayer({ media, onEnded, autoStart, autoplay }) {
   const cue = active.arabic;
   const english = active.english;
   const lit = playing && !media.hasWordTiming;
-  const loading = !!media.audioUrl && !ready;
+  // The recitation is streamed from an external host. If it fails we must say so —
+  // otherwise `ready` never flips and the spinner runs forever.
+  const loading = !!media.audioUrl && !ready && !audioErr;
+
+  function retryAudio() {
+    const a = audioRef.current; if (!a) return;
+    setAudioErr(false); setReady(false); setPlaying(false);
+    a.load();
+  }
 
   return (
     <div className={`video ${full ? "is-full" : ""} ${controlsOn ? "" : "controls-hidden"}`} ref={frameRef}
@@ -235,11 +244,25 @@ export default function VideoPlayer({ media, onEnded, autoStart, autoplay }) {
       ))}
       <div className="video-veil" />
       <audio ref={audioRef} src={media.audioUrl} preload="auto" onLoadedMetadata={onLoaded}
-        onCanPlay={() => setReady(true)}
+        onCanPlay={() => { setReady(true); setAudioErr(false); }}
+        onError={() => { setAudioErr(true); setPlaying(false); }}
         onEnded={() => { if (!loop && !loopLine) { setPlaying(false); if (media.id) writePos(media.id, 0); setEnded(true); onEnded?.(); } }} />
 
       {loading && (
         <div className="video-loading" aria-live="polite"><span className="v-spinner" /><span className="v-loading-txt">Loading…</span></div>
+      )}
+
+      {audioErr && (
+        <div className="video-error" role="alert">
+          <span className="v-err-ic" aria-hidden="true">
+            <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M12 3v11M8 6.5 12 3l4 3.5" opacity="0" /><circle cx="12" cy="12" r="9" /><path d="M12 8v4.5M12 16h.01" />
+            </svg>
+          </span>
+          <p className="v-err-txt">Couldn't load the recitation</p>
+          <p className="v-err-sub">Please check your connection and try again.</p>
+          <button className="v-err-btn" onClick={retryAudio}>Try again</button>
+        </div>
       )}
 
       {/* subtitle stage */}
@@ -258,14 +281,14 @@ export default function VideoPlayer({ media, onEnded, autoStart, autoplay }) {
         {english?.text && <div className="v-translation" key={"t" + (english?.startMs ?? 0)}>{english.text}</div>}
       </div>
 
-      {!started && !loading && (
+      {!started && !loading && !audioErr && (
         <button className="v-bigplay" onClick={togglePlay} aria-label="Play">
           <Play width={40} height={40} />
         </button>
       )}
 
       {/* game-style "watch again" prompt — only when finished and autoplay is off */}
-      {ended && !autoplay && !loading && (
+      {ended && !autoplay && !loading && !audioErr && (
         <button className="v-replay" onClick={replay} aria-label="Watch again">
           <span className="v-replay-ring">
             <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
