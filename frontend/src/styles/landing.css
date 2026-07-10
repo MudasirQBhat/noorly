@@ -103,6 +103,23 @@
 .lx-step h3 { margin: 0 0 4px; color: var(--teal-deep); }
 .lx-step p { color: var(--ink-soft); margin: 0; }
 
+/* ---- FAQ accordion ---- */
+.lx-faq-section { max-width: 760px; }
+.lx-faq { display: flex; flex-direction: column; gap: 12px; }
+.lx-faq-item { background: var(--card); border: 1px solid var(--line); border-radius: 16px; box-shadow: var(--shadow-sm); overflow: hidden; transition: border-color 0.16s; }
+.lx-faq-item[open] { border-color: var(--gold-soft); }
+.lx-faq-item summary {
+  list-style: none; cursor: pointer; display: flex; align-items: center; gap: 14px;
+  padding: 18px 20px; font-family: var(--font-head); font-weight: 700; font-size: 1.05rem;
+  color: var(--teal-deep);
+}
+.lx-faq-item summary::-webkit-details-marker { display: none; }
+.lx-faq-item summary:hover { color: var(--teal); }
+.lx-faq-chev { margin-left: auto; flex: none; color: var(--gold); display: inline-flex; transition: transform 0.2s ease; }
+.lx-faq-item[open] .lx-faq-chev { transform: rotate(180deg); }
+.lx-faq-item > p { margin: 0; padding: 0 20px 18px; color: var(--ink-soft); font-size: 0.98rem; line-height: 1.6; }
+@media (prefers-reduced-motion: reduce) { .lx-faq-chev { transition: none; } }
+
 /* ---- final CTA ---- */
 .lx-final { position: relative; z-index: 2; max-width: 720px; margin: 20px auto 0; padding: 44px 24px; text-align: center; }
 .lx-final h2 { font-size: clamp(1.8rem, 4vw, 2.5rem); color: var(--teal-deep); margin: 12px 0 6px; }

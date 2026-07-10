@@ -22,6 +22,7 @@ const SITE = process.env.SITE_URL || "https://noorlyapp.vercel.app";
 
 const duas = JSON.parse(readFileSync(join(ROOT, "src/data/dua.json"), "utf8"));
 const surahs = JSON.parse(readFileSync(join(ROOT, "src/data/surah.json"), "utf8"));
+const { FAQ } = await import("../src/lib/faq.js");
 const template = readFileSync(join(DIST, "index.html"), "utf8");
 
 const esc = (s) =>
@@ -55,7 +56,7 @@ function head({ title, description, path, jsonld }) {
     <meta name="twitter:title" content="${esc(title)}" />
     <meta name="twitter:description" content="${esc(description)}" />
     <meta name="twitter:image" content="${esc(img)}" />
-    <script type="application/ld+json">${JSON.stringify(jsonld)}</script>`;
+    ${(Array.isArray(jsonld) ? jsonld : [jsonld]).map((j) => `<script type="application/ld+json">${JSON.stringify(j)}</script>`).join("\n    ")}`;
 }
 
 function crumbs(path, name) {
@@ -84,22 +85,35 @@ function emit(path, headHtml, bodyHtml) {
 }
 
 // ---------- home ----------
+const faqText = FAQ.map((f) => `<section><h3>${esc(f.q)}</h3><p>${esc(f.a)}</p></section>`).join("");
 emit("/",
   head({
-    title: "Noorly — Learn & Memorize Duas and Juz 30 for Kids",
-    description: "A calm, free and ad-free way for children to memorize 199 authentic duas and Surah Al-Fatiha plus the 37 surahs of Juz 30, with real recitation and word-by-word highlighting.",
+    title: "Noorly — Learn & Memorize Duas and Juz 30 for Kids, Word by Word",
+    description: "A calm, free and ad-free way for children to memorize 199 authentic duas and Surah Al-Fatiha plus the 37 surahs of Juz 30 — with real recitation, transliteration and word-by-word highlighting.",
     path: "/",
-    jsonld: {
-      "@context": "https://schema.org",
-      "@type": "WebSite",
-      name: "Noorly",
-      url: SITE,
-      description: "Learn and memorize authentic duas and the surahs of Juz 30 with word-by-word recitation.",
-    },
+    jsonld: [
+      {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        name: "Noorly",
+        url: SITE,
+        description: "Learn and memorize authentic duas and the surahs of Juz 30 with word-by-word recitation.",
+      },
+      {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        mainEntity: FAQ.map((f) => ({
+          "@type": "Question",
+          name: f.q,
+          acceptedAnswer: { "@type": "Answer", text: f.a },
+        })),
+      },
+    ],
   }),
-  `<main><h1>Noorly — learn and memorize duas and Juz 30</h1>
+  `<main><h1>Noorly — learn and memorize duas and Juz 30, word by word</h1>
    <p>Noorly turns authentic duas, Surah Al-Fatiha and all the surahs of Juz 30 into gentle little videos — a calm scene, the real recitation, and the words glowing along with subtitles.</p>
-   <p>199 duas from Hisnul Muslim across 14 everyday moments, and 38 surahs recited by Mishary Rashid Alafasy.</p></main>`
+   <p>199 duas from Hisnul Muslim across 14 everyday moments, and 38 surahs recited by Mishary Rashid Alafasy.</p>
+   <h2>Frequently asked questions</h2>${faqText}</main>`
 );
 
 // ---------- about ----------
@@ -116,8 +130,8 @@ emit("/about",
 // ---------- duas ----------
 let n = 0;
 for (const d of duas) {
-  const title = `${d.titleEn} — Dua in Arabic, transliteration & meaning | Noorly`;
-  const description = clip(`${d.titleEn}. ${d.translationEn}`);
+  const title = `${d.titleEn} — dua in Arabic, transliteration & meaning | Noorly`;
+  const description = clip(`${d.titleEn} — Arabic with transliteration and English meaning, and word-by-word recitation to help kids memorize it. ${d.translationEn}`);
   const path = `/watch/dua/${d.id}`;
   emit(path,
     head({
@@ -137,9 +151,9 @@ for (const d of duas) {
 
 // ---------- surahs ----------
 for (const s of surahs) {
-  const title = `Surah ${s.nameEn} (${s.nameArabic}) — word by word with recitation | Noorly`;
+  const title = `Surah ${s.nameEn} (${s.nameArabic}) — word by word, transliteration & meaning | Noorly`;
   const first = s.ayahs?.[0]?.translationEn || "";
-  const description = clip(`Surah ${s.nameEn} — ${s.nameTranslation}, ${s.numberOfAyahs} ayahs. Listen with word-by-word highlighting. ${first}`);
+  const description = clip(`Surah ${s.nameEn} (${s.nameTranslation}), all ${s.numberOfAyahs} ayahs — read and listen word by word with transliteration and English translation. ${first}`);
   const path = `/watch/surah/${s.number}`;
   const ayahs = (s.ayahs || []).map((a) =>
     `<section><p lang="ar" dir="rtl">${esc(a.arabic)}</p><p><em>${esc(a.transliteration)}</em></p><p>${esc(a.translationEn)}</p></section>`

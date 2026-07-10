@@ -4,6 +4,7 @@ import Logo from "../components/Logo.jsx";
 import SupportButton from "../components/SupportButton.jsx";
 import Footer from "../components/Footer.jsx";
 import { setSeo } from "../lib/seo.js";
+import { FAQ } from "../lib/faq.js";
 import { ArabesqueDivider } from "../components/Pattern.jsx";
 import { Play, Book, Star } from "../components/Icons.jsx";
 
@@ -220,6 +221,24 @@ export default function Landing() {
               <h3>{s.title}</h3>
               <p>{s.text}</p>
             </div>
+          ))}
+        </div>
+      </section>
+
+      {/* FAQ */}
+      <section className="lx-section lx-faq-section">
+        <h2 className="lx-h2" data-reveal>Frequently asked questions</h2>
+        <div className="lx-faq" data-reveal>
+          {FAQ.map((f) => (
+            <details className="lx-faq-item" key={f.q}>
+              <summary>
+                {f.q}
+                <span className="lx-faq-chev" aria-hidden="true">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"><path d="M6 9l6 6 6-6" /></svg>
+                </span>
+              </summary>
+              <p>{f.a}</p>
+            </details>
           ))}
         </div>
       </section>

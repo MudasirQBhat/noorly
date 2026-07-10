@@ -50,13 +50,13 @@ export function setSeo({ title, description, path }) {
 }
 
 export const duaSeo = (d) => ({
-  title: `${d.titleEn} — Dua in Arabic, transliteration & meaning | Noorly`,
-  description: clip(`${d.titleEn}. ${d.translationEn}`),
+  title: `${d.titleEn} — dua in Arabic, transliteration & meaning | Noorly`,
+  description: clip(`${d.titleEn} — Arabic with transliteration and English meaning, and word-by-word recitation to help kids memorize it. ${d.translationEn}`),
   path: `/watch/dua/${d.id}`,
 });
 
 export const surahSeo = (s) => ({
-  title: `Surah ${s.nameEn} (${s.nameArabic}) — word by word with recitation | Noorly`,
-  description: clip(`Surah ${s.nameEn} — ${s.nameTranslation}, ${s.numberOfAyahs} ayahs. Listen with word-by-word highlighting. ${s.ayahs?.[0]?.translationEn || ""}`),
+  title: `Surah ${s.nameEn} (${s.nameArabic}) — word by word, transliteration & meaning | Noorly`,
+  description: clip(`Surah ${s.nameEn} (${s.nameTranslation}), all ${s.numberOfAyahs} ayahs — read and listen word by word with transliteration and English translation. ${s.ayahs?.[0]?.translationEn || ""}`),
   path: `/watch/surah/${s.number}`,
 });
