@@ -1,0 +1,11 @@
+node_modules
+**/node_modules
+frontend/dist
+frontend/src
+frontend/index.html
+frontend/vite.config.js
+frontend/package*.json
+.venv-align
+.git
+scripts
+*.log

@@ -1,0 +1,14 @@
+# dependencies
+node_modules/
+# builds
+frontend/dist/
+# local tooling
+.venv-align/
+__pycache__/
+*.pyc
+# env & secrets
+.env
+.env.local
+# os / editor
+.DS_Store
+*.log

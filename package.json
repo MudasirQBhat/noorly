@@ -1,0 +1,19 @@
+{
+  "name": "noorly",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Noorly — a calm, ad-free web app that helps kids memorize authentic duas and the surahs of Juz 30 with synced recitation and word-by-word highlighting.",
+  "scripts": {
+    "install:all": "npm install && npm --prefix backend install && npm --prefix frontend install",
+    "dev": "concurrently -n api,web -c cyan,magenta \"npm --prefix backend run dev\" \"npm --prefix frontend run dev\"",
+    "start:api": "npm --prefix backend start",
+    "start:web": "npm --prefix frontend run dev",
+    "build": "npm --prefix frontend run build"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "dependencies": {
+    "qrcode": "^1.5.4"
+  }
+}

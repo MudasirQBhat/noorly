@@ -1,0 +1,19 @@
+import React from "react";
+import ReactDOM from "react-dom/client";
+import { BrowserRouter } from "react-router-dom";
+import App from "./App.jsx";
+import { AdminProvider } from "./lib/admin.jsx";
+import "./styles/global.css";
+import "./styles/cinema.css";
+import "./styles/app.css";
+import "./styles/landing.css";
+
+ReactDOM.createRoot(document.getElementById("root")).render(
+  <React.StrictMode>
+    <BrowserRouter>
+      <AdminProvider>
+        <App />
+      </AdminProvider>
+    </BrowserRouter>
+  </React.StrictMode>
+);
