@@ -5,6 +5,7 @@ import VideoPlayer from "../components/VideoPlayer.jsx";
 import { duaToCinema, surahToCinema } from "../lib/cinema.js";
 import { CategoryGlyph } from "../components/Pattern.jsx";
 import { useAdmin } from "../lib/admin.jsx";
+import { duaSeo, setSeo, surahSeo } from "../lib/seo.js";
 
 function DownloadIcon() {
   return <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M12 3v12m0 0 4-4m-4 4-4-4M5 21h14" /></svg>;
@@ -87,6 +88,11 @@ export default function Watch({ kind }) {
     }
     return () => { alive = false; };
   }, [kind, params.id, params.number]);
+
+  useEffect(() => {
+    if (!item) return;
+    setSeo(kind === "dua" ? duaSeo(item) : surahSeo(item));
+  }, [item, kind]);
 
   if (missing) return <div className="watch"><p className="empty">Couldn't find that. <Link to="/">Go home</Link></p></div>;
   if (!item || !media) return <div className="watch"><div className="video-skeleton" /><p className="loading">Loading…</p></div>;

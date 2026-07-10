@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import Logo from "../components/Logo.jsx";
 import SupportButton from "../components/SupportButton.jsx";
 import Footer from "../components/Footer.jsx";
+import { setSeo } from "../lib/seo.js";
 import { ArabesqueDivider } from "../components/Pattern.jsx";
 import { Play, Book, Star } from "../components/Icons.jsx";
 
@@ -77,6 +78,14 @@ export default function Landing() {
   const videoRef = useRef(null);
   const [muted, setMuted] = useState(true);
   const [menuOpen, setMenuOpen] = useState(false);
+
+  useEffect(() => {
+    setSeo({
+      title: "Noorly — Learn & Memorize Duas and Juz 30 for Kids",
+      description: "A calm, free and ad-free way for children to memorize 199 authentic duas and Surah Al-Fatiha plus the 37 surahs of Juz 30, with real recitation and word-by-word highlighting.",
+      path: "/",
+    });
+  }, []);
 
   useEffect(() => {
     const v = videoRef.current;

@@ -1,11 +1,11 @@
 {
   "name": "noorly-frontend",
   "version": "1.0.0",
-  "description": "Noorly — help kids memorize authentic duas and Juz-30 surahs",
+  "description": "Noorly \u2014 help kids memorize authentic duas and Juz-30 surahs",
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "vite build && node scripts/prerender.mjs",
     "preview": "vite preview"
   },
   "dependencies": {

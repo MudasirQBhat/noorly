@@ -1,9 +1,14 @@
 import { useEffect, useState } from "react";
 import { getDuas, getSurahs } from "../lib/api.js";
 import { ArabesqueDivider } from "../components/Pattern.jsx";
+import { setSeo } from "../lib/seo.js";
 
 export default function About() {
   const [counts, setCounts] = useState({ duas: 0, cats: 0, surahs: 0 });
+
+  useEffect(() => {
+    setSeo({ title: "Credits & Sources | Noorly", description: "Every text and audio source used in Noorly: Hisnul Muslim, Quran.com, Al Quran Cloud, and reciters Mishary Rashid Alafasy and Shaykh Yahya Hawwa.", path: "/about" });
+  }, []);
 
   useEffect(() => {
     Promise.all([getDuas(), getSurahs()]).then(([d, s]) => {
