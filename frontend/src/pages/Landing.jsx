@@ -79,6 +79,10 @@ export default function Landing() {
   const videoRef = useRef(null);
   const [muted, setMuted] = useState(true);
   const [menuOpen, setMenuOpen] = useState(false);
+  // Full-page loading gate: stays up until the hero video can play. Safety
+  // fallbacks (cached, error, timeout) make sure it can never get stuck.
+  const [ready, setReady] = useState(false);
+  const markReady = () => setReady(true);
 
   useEffect(() => {
     setSeo({
@@ -94,7 +98,21 @@ export default function Landing() {
     v.muted = true;
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (!reduce) v.play?.().catch(() => {});
+    // The video may already be buffered (cache / fast connection) before the
+    // React listeners attach — HAVE_FUTURE_DATA means it can play now.
+    if (v.readyState >= 3) setReady(true);
+    // Never trap the visitor behind the loader if the video is slow or stalls.
+    const t = setTimeout(() => setReady(true), 6000);
+    return () => clearTimeout(t);
   }, []);
+
+  // Lock page scroll while the loader is covering everything.
+  useEffect(() => {
+    if (ready) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => { document.body.style.overflow = prev; };
+  }, [ready]);
 
   function toggleSound() {
     const v = videoRef.current;
@@ -105,6 +123,14 @@ export default function Landing() {
 
   return (
     <div className="landing" ref={ref}>
+      {/* full-page loader — covers everything until the hero video is ready */}
+      <div className={`lx-loader ${ready ? "gone" : ""}`} role="status" aria-live="polite" aria-hidden={ready}>
+        <Logo size={72} />
+        <span className="lx-loader-dots" aria-hidden="true"><i /><i /><i /></span>
+        <p className="lx-loader-title">Getting your calm little corner ready…</p>
+        <p className="lx-loader-sub">A moment of patience — beautiful things are worth the wait. ✦</p>
+      </div>
+
       {/* animated backdrop */}
       <div className="lx-bg" aria-hidden="true">
         <div className="lx-wash lx-wash-a" />
@@ -163,7 +189,8 @@ export default function Landing() {
         <div className="lx-preview" data-reveal>
           <div className="lx-video-frame">
             <video ref={videoRef} className="lx-video" src="/noorly.mp4" poster="/noorly-poster.jpg"
-              loop playsInline preload="metadata" onClick={toggleSound} />
+              loop playsInline preload="metadata" onClick={toggleSound}
+              onCanPlay={markReady} onLoadedData={markReady} onError={markReady} />
             <button className={`lx-unmute ${muted ? "" : "on"}`} onClick={toggleSound}
               title={muted ? "Tap to hear the greeting" : "Mute"}
               aria-label={muted ? "Play the greeting with sound" : "Mute the greeting"}>
